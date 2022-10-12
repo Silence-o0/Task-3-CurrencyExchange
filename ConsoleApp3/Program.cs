@@ -1,61 +1,161 @@
-﻿class Converter
-{
-    public decimal dollarCoef;
-    public decimal euroCoef;
-    public Converter(decimal dollarCoef, decimal euroCoef)
+﻿
+    class Converter
     {
-        this.dollarCoef = dollarCoef;
-        this.euroCoef = euroCoef;
-    }
-}
-
-internal class Program
-{
-    private static void Main(string[] args)
-    {
-        Console.Write("Введiть курс долара по вiдношенню до гривнi: ");
-        decimal dollarToHryvnia = Convert.ToDecimal(Console.ReadLine());
-        Console.Write("Введiть курс євро по вiдношенню до гривнi: ");
-        decimal euroToHryvnia = Convert.ToDecimal(Console.ReadLine());
-        Converter cvrt = new Converter(dollarToHryvnia, euroToHryvnia);
-
-        while (true)
+        public decimal DollarCoef   { get; set; }
+        public decimal EuroCoef   { get; set; }
+        public Converter(decimal dollarCoef, decimal euroCoef)
         {
-            Console.WriteLine("Оберiть операцiю, яку хочете здiйснити та введiть її номер:");
-            Console.WriteLine("1. Конвертувати гривню в долар.");
-            Console.WriteLine("2. Конвертувати гривню в євро.");
-            Console.WriteLine("3. Конвертувати долар у гривню.");
-            Console.WriteLine("4. Конвертувати євро у гривню.");
-            Console.WriteLine("0. Завершити програму.");
-            int operationNum = Convert.ToInt32(Console.ReadLine());
-
-            decimal sumToConvert = 0;
-            if (operationNum != 0)
+            this.DollarCoef = dollarCoef;
+            this.EuroCoef = euroCoef;
+        }
+        public decimal ConvertCurrency(decimal coef)
+        {
+            Console.Write("Вкажiть суму, яку хочете конвертувати: ");
+            decimal sum = this.EnterAndCheckCorrectness();
+            return sum * coef;
+        }
+        public decimal EnterAndCheckCorrectness()
+        {
+            decimal money;
+            while (true)
             {
-                Console.Write("Введiть суму, яку хочете конвертувати: ");
-                sumToConvert = Convert.ToDecimal(Console.ReadLine());
+                try
+                {
+                    money = Convert.ToDecimal(Console.ReadLine());
+                    while (money <= 0)
+                    {
+                        Console.WriteLine("Значення не може бути вiд'ємним або дорiвнювати нулю.");
+                        money = Convert.ToDecimal(Console.ReadLine());
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Недопустимий тип значення! Введiть ще раз.");
+                    continue;
+                }
+                break;
             }
-            switch (operationNum) {
-                case 1:            
-                Console.WriteLine($"Результат: {Math.Round(sumToConvert / cvrt.dollarCoef, 2)} доларiв.");
-                    break;
-                case 2:
-                    Console.WriteLine($"Результат: {Math.Round(sumToConvert / cvrt.euroCoef, 2)} євро.");                 
-                    break;
-                case 3:
-                    Console.WriteLine($"Результат: {Math.Round(sumToConvert * cvrt.dollarCoef, 2)} гривень.");
-                    break;
-                case 4:
-                    Console.WriteLine($"Результат: {Math.Round(sumToConvert * cvrt.euroCoef, 2)} гривень.");
-                    break;
-                case 0:
-                    Environment.Exit(0);
-                    break;
-                default:  
-                    Console.WriteLine("ERROR");
-                    break;
-            }
-        
+            return money;
         }
     }
-}
+
+   
+
+    internal class Program
+    {
+        public static int EnterAndCheckTypeOfOperationNum ()
+        {
+            int num;
+            while (true)
+            {
+                try
+                {
+                    num = Convert.ToInt32(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Недопустимий тип значення! Введiть ще раз.");
+                    continue;
+                }
+                break;
+            }
+            return num;
+        }
+        private static void Main(string[] args)
+        {
+            Converter convertObj = new Converter( 0, 0 );
+
+                Console.Write("Введiть курс долара по вiдношенню до гривнi: ");
+                convertObj.DollarCoef = convertObj.EnterAndCheckCorrectness();
+
+                Console.Write("Введiть курс євро по вiдношенню до гривнi: ");
+                convertObj.EuroCoef = convertObj.EnterAndCheckCorrectness();
+
+            while (true)
+            {
+                Console.WriteLine("Оберiть, з якими валютами ви хочете здiйснити операцiю, та введiть номер.");
+                Console.WriteLine("1. Долар/гривня.");
+                Console.WriteLine("2. Євро/гривня.");
+                Console.WriteLine("3. Долар/євро.");
+                Console.WriteLine("0. Завершити програму.");
+
+                int currencyChooseNum = EnterAndCheckTypeOfOperationNum();
+
+                int operationNum;
+
+                switch (currencyChooseNum)
+                {
+                    case 1:
+                        do
+                        {
+                            Console.WriteLine("Вкажiть номер операцiї, яку хочете здiйснити.");
+                            Console.WriteLine("1. Конвертувати гривню в долар.");
+                            Console.WriteLine("2. Конвертувати долар в гривню.");
+                            Console.WriteLine("0. Повернутися в головне меню.");
+
+                            operationNum = EnterAndCheckTypeOfOperationNum();
+                        }
+                        while (operationNum < 0 || operationNum > 2);
+
+                        if (operationNum == 1)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(1 / convertObj.DollarCoef), 2)} USD.");
+                        }
+                        else if (operationNum == 2)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(convertObj.DollarCoef), 2)} UAH.");
+                        }
+                        break;
+                    case 2:
+                        do 
+                        {
+                            Console.WriteLine("Вкажiть номер операцiї, яку хочете здiйснити.");
+                            Console.WriteLine("1. Конвертувати гривню в євро.");
+                            Console.WriteLine("2. Конвертувати євро у гривню.");
+                            Console.WriteLine("0. Повернутися в головне меню.");
+
+                            operationNum = EnterAndCheckTypeOfOperationNum();
+                        }
+                        while (operationNum < 0 || operationNum > 2);
+
+                        if (operationNum == 1)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(1 / convertObj.EuroCoef), 2)} EUR.");
+                        }
+                        else if (operationNum == 2)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(convertObj.EuroCoef), 2)} UAH.");
+                        }
+                        break;
+                    case 3:
+                        do
+                        {
+                            Console.WriteLine("Вкажiть номер операцiї, яку хочете здiйснити.");
+                            Console.WriteLine("1. Конвертувати долар в євро.");
+                            Console.WriteLine("2. Конвертувати євро у долар.");
+                            Console.WriteLine("0. Повернутися в головне меню.");
+
+                            operationNum = EnterAndCheckTypeOfOperationNum();
+                        }
+                        while (operationNum < 0 || operationNum > 2);
+
+                        if (operationNum == 1)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(convertObj.EuroCoef/ convertObj.DollarCoef), 2)} EUR.");
+                        }
+                        else if (operationNum == 2)
+                        {
+                            Console.WriteLine($"Результат: {Math.Round(convertObj.ConvertCurrency(convertObj.DollarCoef / convertObj.EuroCoef), 2)} USD.");
+                        }
+                        break;
+                    case 0:
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        Console.WriteLine("Помилка! Введеної операцiї не iснує!");
+                        break;
+                }
+
+            }
+        }
+    }
